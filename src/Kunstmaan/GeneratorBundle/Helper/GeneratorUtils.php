@@ -7,7 +7,7 @@ use Sensio\Bundle\GeneratorBundle\Command\Helper\DialogHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * GeneratorUtils
@@ -164,12 +164,12 @@ class GeneratorUtils
      * @param InputInterface     $input
      * @param OutputInterface    $output
      * @param DialogHelper       $dialog
-     * @param Kernel             $kernel
+     * @param KernelInterface    $kernel
      * @param ContainerInterface $container
      *
      * @return InputAssistant
      */
-    public static function getInputAssistant(InputInterface &$input, OutputInterface $output, DialogHelper $dialog, Kernel $kernel, ContainerInterface $container)
+    public static function getInputAssistant(InputInterface &$input, OutputInterface $output, DialogHelper $dialog, KernelInterface $kernel, ContainerInterface $container)
     {
         return new InputAssistant($input, $output, $dialog, $kernel, $container);
     }

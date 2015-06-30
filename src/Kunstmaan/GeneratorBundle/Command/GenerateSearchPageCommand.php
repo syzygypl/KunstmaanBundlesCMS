@@ -9,9 +9,12 @@ use Sensio\Bundle\GeneratorBundle\Command\Validators;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineCommand;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 /**
  * Generates a SearchPage based on the KunstmaanNodeSearchBundle
+ * @method SearchPageGenerator getGenerator(BundleInterface $bundle = null)
+
  */
 class GenerateSearchPageCommand extends GenerateDoctrineCommand
 {
@@ -50,8 +53,9 @@ EOT
     /**
      * Executes the command.
      *
-     * @param InputInterface  $input  An InputInterface instance
+     * @param InputInterface $input An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
+     * @return void
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -61,18 +65,26 @@ EOT
         GeneratorUtils::ensureOptionsProvided($input, array('namespace'));
 
         $namespace = Validators::validateBundleNamespace($input->getOption('namespace'));
-        $bundle = strtr($namespace, array('\\' => ''));
 
         $prefix = $input->getOption('prefix');
         $createPage = $input->getOption('createpage');
-        $bundle = $this
-            ->getApplication()
-            ->getKernel()
-            ->getBundle($bundle);
 
-        $rootDir = $this->getApplication()->getKernel()->getRootDir();
+        $kernel = $this->getContainer()->get('kernel');
+        $bundle = array_reduce($kernel->getBundles(), function ($result, $bundle) use ($namespace) {
+            if ($result) {
+                return $result;
+            }
 
-        $generator = $this->getGenerator($this->getApplication()->getKernel()->getBundle("KunstmaanGeneratorBundle"));
+            if (substr(get_class($bundle), 0, strlen($namespace)) === $namespace) {
+                return $bundle;
+            }
+
+            return null;
+        });
+
+        $rootDir = $kernel->getRootDir();
+
+        $generator = $this->getGenerator($kernel->getBundle("KunstmaanGeneratorBundle"));
         $generator->generate($bundle, $prefix, $rootDir, $createPage, $output);
 
         $output->writeln(array(
@@ -93,7 +105,7 @@ EOT
         $dialog = $this->getDialogHelper();
         $dialog->writeSection($output, 'Welcome to the SearchPage generator');
 
-        $inputAssistant = GeneratorUtils::getInputAssistant($input, $output, $dialog, $this->getApplication()->getKernel(), $this->getContainer());
+        $inputAssistant = GeneratorUtils::getInputAssistant($input, $output, $dialog, $this->getContainer()->get('kernel'), $this->getContainer());
 
         $inputAssistant->askForNamespace(array(
             '',

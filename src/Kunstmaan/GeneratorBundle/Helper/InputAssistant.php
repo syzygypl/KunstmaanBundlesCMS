@@ -7,7 +7,7 @@ use Sensio\Bundle\GeneratorBundle\Command\Validators;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @deprecated the functions in this class should be moved to the KunstmaanGenerateCommand class.
@@ -23,7 +23,7 @@ class InputAssistant
     /** @var DialogHelper */
     private $dialog;
 
-    /** @var Kernel */
+    /** @var KernelInterface */
     private $kernel;
 
     /** @var ContainerInterface */
@@ -33,10 +33,10 @@ class InputAssistant
      * @param InputInterface $input
      * @param OutputInterface $output
      * @param DialogHelper $dialog
-     * @param Kernel $kernel
+     * @param KernelInterface $kernel
      * @param ContainerInterface $container
      */
-    public function __construct(InputInterface &$input, OutputInterface $output, DialogHelper $dialog, Kernel $kernel, ContainerInterface $container)
+    public function __construct(InputInterface &$input, OutputInterface $output, DialogHelper $dialog, KernelInterface $kernel, ContainerInterface $container)
     {
         $this->input = $input;
         $this->output = $output;
@@ -142,10 +142,10 @@ class InputAssistant
     /**
      * Returns a list of namespaces as array with a forward slash to split the namespace & bundle.
      *
-     * @param Kernel $kernel
+     * @param KernelInterface $kernel
      * @return array
      */
-    private function getNamespaceAutoComplete(Kernel $kernel)
+    private function getNamespaceAutoComplete(KernelInterface $kernel)
     {
         $ret = array();
         foreach ($kernel->getBundles() as $k => $v) {
